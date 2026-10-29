@@ -345,8 +345,10 @@ class SparseActionDiT(nn.Module):
             raise ValueError(
                 f"`action_tokens` last dim must be {self.action_dim}, got {action_tokens.shape[2]}"
             )
-        if timestep.ndim != 1:
-            raise ValueError(f"`timestep` must be 1D [B] or [1], got shape {tuple(timestep.shape)}")
+        if timestep.ndim not in (1, 2):
+            raise ValueError(f"`timestep` must be [B], [1], or [B,T], got {tuple(timestep.shape)}")
+        if timestep.ndim == 2 and tuple(timestep.shape) != tuple(action_tokens.shape[:2]):
+            raise ValueError("Token timestep must match action [B,T] dimensions")
         if context.ndim != 3:
             raise ValueError(
                 f"`context` must be 3D [B, L, D], got shape {tuple(context.shape)}"
@@ -384,8 +386,14 @@ class SparseActionDiT(nn.Module):
                 f"Action token length {seq_len} exceeds RoPE cache {self.freqs.shape[0]}."
             )
 
-        t = self.time_embedding(sinusoidal_embedding_1d(self.freq_dim, timestep))
-        t_mod = self.time_projection(t).unflatten(1, (6, self.hidden_dim))
+        if timestep.ndim == 2:
+            t = self.time_embedding(
+                sinusoidal_embedding_1d(self.freq_dim, timestep.flatten())
+            ).unflatten(0, (batch_size, seq_len))
+            t_mod = self.time_projection(t).unflatten(-1, (6, self.hidden_dim))
+        else:
+            t = self.time_embedding(sinusoidal_embedding_1d(self.freq_dim, timestep))
+            t_mod = self.time_projection(t).unflatten(1, (6, self.hidden_dim))
 
         tokens = self.action_encoder(action_tokens)
         context_emb = self.text_embedding(context)

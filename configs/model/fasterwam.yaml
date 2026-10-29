@@ -61,3 +61,7 @@ action_scheduler:
 
 loss:
   lambda_action: 1.0
+
+# null: ordinary flow matching; positive D: clean prefix d in [0,D).
+training_rtc:
+  simulated_delay: null

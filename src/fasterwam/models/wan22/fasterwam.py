@@ -6,6 +6,7 @@ from .sparse_action_dit import SparseActionDiT, DEFAULT_SPARSE_MOT_CONDITION_LAY
 from .jointwam import JointWAM
 from .helpers.loader import load_wan22_ti2v_5b_components
 from .sparse_mot import SparseMoT
+from .training_rtc import TrainingRTCConfig
 
 
 class FasterWAM(JointWAM):
@@ -39,6 +40,7 @@ class FasterWAM(JointWAM):
         mot_action_video_attention_layers: Optional[Sequence[int]] = None,
         video_kv_fusion: Optional[str] = None,
         video_kv_fusion_init: str = "current_layer",
+        training_rtc: TrainingRTCConfig | None = None,
     ):
         if video_dit_config is None:
             raise ValueError("`video_dit_config` is required for FasterWAM.")
@@ -130,6 +132,7 @@ class FasterWAM(JointWAM):
             loss_lambda_video=loss_lambda_video,
             loss_lambda_action=loss_lambda_action,
             mot_action_video_attention_layers=normalized_condition_layers,
+            training_rtc=training_rtc,
         )
         model.condition_layers = normalized_condition_layers
         model.model_paths = {

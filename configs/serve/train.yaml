@@ -1,0 +1,11 @@
+# A checkpoint trained with model.training_rtc.simulated_delay is required.
+train:
+  enabled: true
+rtc:
+  enabled: false
+simple:
+  enabled: false
+action_infer_mode: one_pass_future_cache  # or joint_rollout
+num_inference_steps: 10
+seed: 42
+control_fps: null

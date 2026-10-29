@@ -1,0 +1,14 @@
+# @package _global_
+# Same datasets, images, architecture and optimizer as the ordinary 2-wrist run.
+defaults:
+  - widowxai_fasterwam_2wrist_vertical_384_1e-4
+  - _self_
+
+model:
+  training_rtc:
+    simulated_delay: 8  # sample d=0..7 with p(d) proportional to exp(-d)
+
+# Do not prune prior experiment states or contact an external logging service.
+keep_last_n_states: null
+wandb:
+  enabled: false
